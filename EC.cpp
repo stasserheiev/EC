@@ -1,3 +1,4 @@
+#include <chrono>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/integer/mod_inverse.hpp>
 #include <iostream>
@@ -5,6 +6,10 @@
 #include <bcrypt.h>
 using namespace std;
 using namespace boost::multiprecision;
+using std::chrono::high_resolution_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
+using std::chrono::milliseconds;
 
 #pragma comment(lib, "bcrypt.lib")
 
@@ -318,12 +323,32 @@ int main() {
     cout << "O + O = " << O + O << endl;
     cout << "Generator G: " << G << endl;
 
+    auto t1 = high_resolution_clock::now();
     P_Point test = RandomPoint(G, curve, n);
+    auto t2 = high_resolution_clock::now();
+    duration<double, std::milli> ms_double = t2 - t1;
+
+    cout << "Duration of RandomPoint() = " << ms_double.count() << endl;
+
     cout << "Random Point: " << test << endl;
+    t1 = high_resolution_clock::now();
     P_Point test1 = test.ScalarMultMontgomeri(n);
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    cout << "Duration of ScalarMultiplicationMontgomery = " << ms_double.count() << endl;
+
     cout << "Test (Should be Point at infinity): " << test1 << endl;
+
+    
     P_Point test2 = test1 + test;
+    
     cout << "Random Point: " << test2 << endl;
+
+    t1 = high_resolution_clock::now();
+    P_Point test3 = test + G;
+    t2 = high_resolution_clock::now();
+    ms_double = t2 - t1;
+    cout << "Duration of PointAdd = " << ms_double.count() << endl;
 
 
     cin.get();
